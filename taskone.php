@@ -1,145 +1,157 @@
 <?php
-class TableRows extends RecursiveIteratorIterator { 
-    function __construct($it) {
-      echo "<table style='border:1px solid black;'>";
-      echo "<tr><th>Order Id</th><th>Comment</th><th>Ship Date Expected</th></tr>";
-
-        parent::__construct($it, self::LEAVES_ONLY); 
-    }
-
-    function current() {
-        return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
-    }
-
-    function beginChildren() { 
-        echo "<tr>"; 
-    } 
-
-    function endChildren() { 
-        echo "</tr>" . "\n";
-    } 
-}
 
 require 'config.php';
 
-echo '<h1>Comments about candy</h1>';
+$connection = new mysqli($serverName, $username, $secret, $databaseName);
 
-try {
-  $conn = new PDO("mysql:host=$serverName;dbname=$databaseName", $username, $secret);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $stmt = $conn->prepare("SELECT * FROM sweetwater_test"); 
-  $stmt->execute();
+if ($connection->connect_error) {
+    die("Connection Error: " . $connection->connect_error);
+}
 
-  $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+?>
 
-  foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+<table style="border:2px solid black;position:fixed;top:0;left:0;background:#FFFFFF;">
 
-    if (strpos($v, 'candy') !== false) {
-      echo $v;
+<tr style="border:2px solid black;">
+
+  <th>Comments about candy</th>
+  <th>Comments about call me / don't call me</th>
+  <th>Comments about who referred me</th>
+  <th>Comments about signature requirements upon delivery</th>
+  <th>Miscellaneous comments (everything else)</th>
+
+</tr>
+
+<tr style="border:2px solid black;">
+
+  <td align="center" style="color:orange;width:150px;border:2px solid orange;">ORANGE</td>
+
+  <td align="center" style="color:red;width:150px;border:2px solid red;">RED</td>
+
+  <td align="center" style="color:green;width:150px;border:2px solid green;">GREEN</td>
+
+  <td align="center" style="color:blue;width:150px;border:2px solid blue;">BLUE</td>
+
+  <td align="center" style="color:black;width:150px;border:2px solid black;">BLACK</td>
+
+</tr>
+
+</table>
+
+<br>
+
+<?php
+
+$data = $connection->query("SELECT * FROM sweetwater_test");
+
+if ($data->num_rows > 0) {
+
+    echo "<table style='border:2px solid orange;margin-top:100px;'><tr><th>orderid</th><th>comments</th><th>shipdate_expected</th></tr>";
+
+    while($row = $data->fetch_assoc()) {
+
+      if (strpos($row["comments"], 'candy') !== false) {
+        echo "<tr><td style='width:150px;border:2px solid orange;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid orange;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid orange;'>" . $row["shipdate_expected"]. "</td></tr>";
+      }
+      /* else if (strpos($row["comments"], 'call') !== false) {
+        echo "<tr><td style='width:150px;border:2px solid red;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid red;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid red;'>" . $row["shipdate_expected"]. "</td></tr>";
+      }
+      else if (strpos($row["comments"], 'referred') !== false) {
+        echo "<tr><td style='width:150px;border:2px solid green;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid green;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid green;'>" . $row["shipdate_expected"]. "</td></tr>";
+      }
+      else if (strpos($row["comments"], 'signature') !== false) {
+        echo "<tr><td style='width:150px;border:2px solid blue;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid blue;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid blue;'>" . $row["shipdate_expected"]. "</td></tr>";
+      }
+      else {
+        echo "<tr><td style='width:150px;border:2px solid black;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid black;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid black;'>" . $row["shipdate_expected"]. "</td></tr>";
+      } */
+    }
+    echo "</table>";
+} else {
+    echo "0 results";
+}
+
+echo "<br>";
+
+$data2 = $connection->query("SELECT * FROM sweetwater_test");
+
+if ($data2->num_rows > 0) {
+
+  echo "<table style='border:2px solid red;'><tr><th>orderid</th><th>comments</th><th>shipdate_expected</th></tr>";
+
+  while($row = $data2->fetch_assoc()) {
+
+    if (strpos($row["comments"], 'call') !== false) {
+      echo "<tr><td style='width:150px;border:2px solid red;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid red;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid red;'>" . $row["shipdate_expected"]. "</td></tr>";
     }
   }
+  echo "</table>";
+} else {
+  echo "0 results";
 }
-catch(PDOException $e) {
-  echo "Error: " . $e->getMessage();
-}
-echo "</table>";
 
-echo '<h1>Comments about call me / don\'t call me</h1>';
+echo "<br>";
 
-try {
-  $conn = new PDO("mysql:host=$serverName;dbname=$databaseName", $username, $secret);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $stmt = $conn->prepare("SELECT * FROM sweetwater_test"); 
-  $stmt->execute();
+$data3 = $connection->query("SELECT * FROM sweetwater_test");
 
-  $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+if ($data3->num_rows > 0) {
 
-  foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+  echo "<table style='border:2px solid green;'><tr><th>orderid</th><th>comments</th><th>shipdate_expected</th></tr>";
 
-    if (strpos($v, 'call') !== false) {
-      echo $v;
+  while($row = $data3->fetch_assoc()) {
+
+    if (strpos($row["comments"], 'referred') !== false) {
+      echo "<tr><td style='width:150px;border:2px solid green;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid green;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid green;'>" . $row["shipdate_expected"]. "</td></tr>";
     }
   }
+  echo "</table>";
+} else {
+  echo "0 results";
 }
-catch(PDOException $e) {
-  echo "Error: " . $e->getMessage();
-}
-$conn = null;
-echo "</table>";
 
-echo '<h1>Comments about who referred me</h1>';
+echo "<br>";
 
-try {
-  $conn = new PDO("mysql:host=$serverName;dbname=$databaseName", $username, $secret);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $stmt = $conn->prepare("SELECT * FROM sweetwater_test"); 
-  $stmt->execute();
+$data4 = $connection->query("SELECT * FROM sweetwater_test");
 
-  $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+if ($data4->num_rows > 0) {
 
-  foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+  echo "<table style='border:2px solid blue;'><tr><th>orderid</th><th>comments</th><th>shipdate_expected</th></tr>";
 
-    if (strpos($v, 'referred') !== false) {
-      echo $v;
+  while($row = $data4->fetch_assoc()) {
+
+    if (strpos($row["comments"], 'signature') !== false) {
+      echo "<tr><td style='width:150px;border:2px solid blue;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid blue;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid blue;'>" . $row["shipdate_expected"]. "</td></tr>";
     }
   }
+  echo "</table>";
+} else {
+  echo "0 results";
 }
-catch(PDOException $e) {
-  echo "Error: " . $e->getMessage();
-}
-$conn = null;
-echo "</table>";
 
-echo '<h1>Comments about signature requirements upon delivery</h1>';
+echo "<br>";
 
-try {
-  $conn = new PDO("mysql:host=$serverName;dbname=$databaseName", $username, $secret);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $stmt = $conn->prepare("SELECT * FROM sweetwater_test"); 
-  $stmt->execute();
+$data5 = $connection->query("SELECT * FROM sweetwater_test");
 
-  $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+if ($data5->num_rows > 0) {
 
-  foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+  echo "<table style='border:2px solid black;'><tr><th>orderid</th><th>comments</th><th>shipdate_expected</th></tr>";
 
-    if (strpos($v, 'signature') !== false) {
-      echo $v;
-    }
-  }
-}
-catch(PDOException $e) {
-  echo "Error: " . $e->getMessage();
-}
-$conn = null;
-echo "</table>";
+  while($row = $data5->fetch_assoc()) {
 
-echo '<h1>Miscellaneous comments (everything else)</h1>';
-
-try {
-  $conn = new PDO("mysql:host=$serverName;dbname=$databaseName", $username, $secret);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $stmt = $conn->prepare("SELECT * FROM sweetwater_test"); 
-  $stmt->execute();
-
-  $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-
-  foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
-
-    if (strpos($v, 'candy') !== true) {
-      if (strpos($v, 'call') !== true) {
-        if (strpos($v, 'referred') !== true) {
-          if (strpos($v, 'signature') !== true) {
-            echo $v;
+    if (strpos($row["comments"], 'candy') !== true) {
+      if (strpos($row["comments"], 'call') !== true) {
+        if (strpos($row["comments"], 'referred') !== true) {
+          if (strpos($row["comments"], 'signature') !== true) {
+            echo "<tr><td style='width:150px;border:2px solid black;'>" . $row["orderid"]. "</td><td style='width:150px;border:2px solid black;'>" . $row["comments"]. "</td><td style='width:150px;border:2px solid black;'>" . $row["shipdate_expected"]. "</td></tr>";
           }
         }
       }
     }
   }
+  echo "</table>";
+} else {
+  echo "0 results";
 }
-catch(PDOException $e) {
-  echo "Error: " . $e->getMessage();
-}
-$conn = null;
-echo "</table>";
 
+$connection->close();
 ?>

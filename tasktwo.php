@@ -1,39 +1,37 @@
 <?php
+
 require 'config.php';
 
-try {
-  $conn = new PDO("mysql:host=$serverName;dbname=$databaseName", $username, $secret);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $stmt = $conn->prepare("SELECT * FROM sweetwater_test"); 
-  $stmt->execute();
+$connection = new mysqli($serverName, $username, $secret, $databaseName);
 
-  $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+if ($connection->connect_error) {
+    die("Connection Error: " . $connection->connect_error);
+}
 
-  foreach($stmt->fetch() as $k => $v) {
+$sql = "SELECT * FROM sweetwater_test";
+$data = $connection->query($sql);
 
-    if (strpos($v, 'Expected') !== false) {
+if ($data->num_rows > 0) {
 
-      /* while(preg_match_all('/\d{2}\/\d{2}\/\d{2}/', $v, $matches)) {
-        print_r($matches);
-      //}*/
+  while($row = $data->fetch_assoc()) {
 
-      $esd = $v;
+    if(preg_match_all('/\d{2}\/\d{2}\/\d{2}/', $row["comments"], $matches)) {
 
-      $new_array = explode("Expected Ship Date: ", $esd);
+      $extracted_date = $matches[0][0];
+      $orderid = $row['orderid'];
 
-      $orderid = $new_array[0];
-      $extracted_date = $new_array[1];
+      $sql = "UPDATE sweetwater_test SET shipdate_expected='" . $extracted_date . "' WHERE orderid=" . $orderid;
 
-      $stmt = $conn->prepare("UPDATE sweetwater_test SET shipdate_expected='$extracted_date' WHERE orderid=$orderid");
-
-      //$stmt->execute();
-
-      print_r($new_array);
+      if ($connection->query($sql) === TRUE) {
+        echo "Database date with OrderID = " . $orderid . " was modified successfully!";
+        echo '<br>';
+      } else {
+        echo "Error : " . $connection->error;
+      }
     }
   }
-  echo 'Database Successfully Updated!';
+} else {
+  echo "No results found!";
 }
-catch(PDOException $e) {
-  echo "Error: " . $e->getMessage();
-}
+$connection->close();
 ?>
